@@ -3,7 +3,7 @@ import Generator from './Generator';
 import AppProgressBar from './ProgressBar';
 import BooksManager from './BooksManager';
 
-var totalBooks = 100000;
+var totalBooks = 10000;
 
 export default React.createClass({
 	componentWillMount: function() {

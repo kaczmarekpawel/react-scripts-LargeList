@@ -3,7 +3,6 @@ export default {
 	total: 0
 };
 
-
 const BookCheckers = {
 
 	isHalloweenBook: function(book) {
