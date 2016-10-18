@@ -8,23 +8,33 @@ export default React.createClass({
 
 	getInitialState: function () {
 		return {
-			authorName: '',
-			authorGender: null,
-			bookGenre: ''
+			filters: {}
 		}
 	},
 
-	updateFilter: function (e) {
-		var state = {};
-		state[e.target.dataset.name] = e.target.value;
-		this.setState(state);
+	filterAuthorGender: function(book) {
+		return book.author.gender === this.state.filters.filterAuthorGender;
+	} ,
+	filterAuthorName: function(book) {
+		return book.author.name.indexOf(this.state.filters.filterAuthorName) !== -1;
 	},
+	filterBookGenre: function(book) {
+		return book.genre === this.state.filters.filterBookGenre;
+	},
+
+
+	updateFilter: function (e) {
+		var filters = JSON.parse(JSON.stringify(this.state.filters));
+		filters[e.target.dataset.name] = e.target.value;
+		this.setState({filters});
+	},
+
 
 	render: function () {
 
-		const filteredBooks = this._isFilterDisabled()
-			? this.props.books
-			: this.props.books.filter(this._filterBook);
+		const filteredBooks = this._isFilterEnabled()
+			? this.props.books.filter(this._filterBook)
+			: this.props.books;
 
 		return (
 			<div>
@@ -32,13 +42,13 @@ export default React.createClass({
 					<FormGroup>
 						<FormControl
 							type="text"
-							data-name="authorName"
+							data-name="filterAuthorName"
 							value={this.state.authorName}
 							placeholder="Author name"
 							onChange={this.updateFilter}/>
 						<FormControl
 							componentClass="select"
-							data-name="authorGender"
+							data-name="filterAuthorGender"
 							onChange={this.updateFilter}>
 							<option value="">Author gender</option>
 							<option value="Male">Male</option>
@@ -46,7 +56,7 @@ export default React.createClass({
 						</FormControl>
 						<FormControl
 							componentClass="select"
-							data-name="bookGenre"
+							data-name="filterBookGenre"
 							onChange={this.updateFilter}>
 							<option value="">Book genre</option>
 							{Genres.sort().map(function (genre, i) {
@@ -63,19 +73,14 @@ export default React.createClass({
 		)
 	},
 
-	_isFilterDisabled: function () {
-		return !this.state.authorName && !this.state.authorGender && !this.state.bookGenre;
+	_isFilterEnabled: function () {
+		return Object.keys(this.state.filters).some(key => key);
 	},
 
 	_filterBook: function(book) {
-		var filtered = true;
-		if (this.state.authorName)
-			filtered &= book.author.name.indexOf(this.state.authorName) !== -1;
-		if (this.state.authorGender)
-			filtered &= book.author.gender === this.state.authorGender;
-		if (this.state.bookGenre)
-			filtered &= book.genre === this.state.bookGenre;
-		return filtered;
+		return Object.keys(this.state.filters)
+			.filter( key => this.state.filters[key] )
+			.reduce( (prev, cur) => prev &= this[cur](book) , true);
 	}
 });
 
