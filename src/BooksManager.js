@@ -1,7 +1,8 @@
 import React from 'react';
 import Genres from './model/Genres'
 import BooksList from './BooksList';
-import {Form, FormGroup, FormControl} from 'react-bootstrap'
+import {BookCheckers} from './model/Books'
+import {Form, FormGroup, FormControl, Checkbox} from 'react-bootstrap'
 
 
 export default React.createClass({
@@ -21,11 +22,13 @@ export default React.createClass({
 	filterBookGenre: function(book) {
 		return book.genre === this.state.filters.filterBookGenre;
 	},
+	filterBookType: function(book) {
+		return BookCheckers[this.state.filters.filterBookType](book)
+	},
 
-
-	updateFilter: function (e) {
+	updateFilter: function(name, value) {
 		var filters = JSON.parse(JSON.stringify(this.state.filters));
-		filters[e.target.dataset.name] = e.target.value;
+		filters[name] = value;
 		this.setState({filters});
 	},
 
@@ -45,11 +48,11 @@ export default React.createClass({
 							data-name="filterAuthorName"
 							value={this.state.authorName}
 							placeholder="Author name"
-							onChange={this.updateFilter}/>
+							onChange={e => this.updateFilter(e.target.dataset.name, e.target.value)}/>
 						<FormControl
 							componentClass="select"
 							data-name="filterAuthorGender"
-							onChange={this.updateFilter}>
+							onChange={e => this.updateFilter(e.target.dataset.name, e.target.value)}>
 							<option value="">Author gender</option>
 							<option value="Male">Male</option>
 							<option value="Female">Female</option>
@@ -57,11 +60,19 @@ export default React.createClass({
 						<FormControl
 							componentClass="select"
 							data-name="filterBookGenre"
-							onChange={this.updateFilter}>
+							onChange={e => this.updateFilter(e.target.dataset.name, e.target.value)}>
 							<option value="">Book genre</option>
 							{Genres.sort().map(function (genre, i) {
 								return <option key={i} value={genre}>{genre}</option>
 							})}
+						</FormControl>
+						<FormControl
+							componentClass="select"
+							data-name="filterBookType"
+							onChange={e => this.updateFilter(e.target.dataset.name, e.target.value)}>
+							<option value="">Special Book Type</option>
+							<option value="isHalloweenBook">Halloween Book</option>
+							<option value="isFridayFinanceBook">Friday Finance Book</option>
 						</FormControl>
 					</FormGroup>
 				</Form>
@@ -80,7 +91,7 @@ export default React.createClass({
 	_filterBook: function(book) {
 		return Object.keys(this.state.filters)
 			.filter( key => this.state.filters[key] )
-			.reduce( (prev, cur) => prev &= this[cur](book) , true);
+			.reduce( (isFiltered, filterName) => isFiltered &= this[filterName](book) , true);
 	}
 });
 
