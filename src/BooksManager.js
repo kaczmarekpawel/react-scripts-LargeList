@@ -1,11 +1,16 @@
 import React from 'react';
+import _ from 'lodash';
 import Genres from './model/Genres'
 import BooksList from './BooksList';
 import {BookCheckers} from './model/Books'
-import {Form, FormGroup, FormControl, Checkbox} from 'react-bootstrap'
+import {Form, FormGroup, FormControl} from 'react-bootstrap'
 
 
 export default React.createClass({
+
+	componentWillMount: function() {
+		this.updateFilter = _.debounce(this.updateFilter, 500);
+	},
 
 	getInitialState: function () {
 		return {
@@ -32,15 +37,16 @@ export default React.createClass({
 		this.setState({filters});
 	},
 
-
 	render: function () {
 
 		const filteredBooks = this._isFilterEnabled()
 			? this.props.books.filter(this._filterBook)
 			: this.props.books;
 
+
 		return (
 			<div>
+				{this.state.updating}
 				<Form inline>
 					<FormGroup>
 						<FormControl
@@ -66,6 +72,7 @@ export default React.createClass({
 								return <option key={i} value={genre}>{genre}</option>
 							})}
 						</FormControl>
+
 						<FormControl
 							componentClass="select"
 							data-name="filterBookType"
