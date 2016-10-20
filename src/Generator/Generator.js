@@ -1,5 +1,5 @@
-import Worker from 'worker?inline!./Worker.js';
-import Books from './model/Books';
+import Worker from 'worker?inline!./GeneratorWorker.js';
+import Books from '../Books/Books';
 
 var updateHandlers = [];
 
@@ -9,6 +9,7 @@ function fireUpdateHandlers(booksUpdate) {
 		handler(booksUpdate);
 	});
 }
+
 
 export default {
 
@@ -20,11 +21,12 @@ export default {
 		var worker = new Worker();
 
 		worker.onmessage = function(e) {
-			Books.loaded = Books.loaded.concat(e.data);
+			Books.appendBatch(e.data.payload);
+
 			fireUpdateHandlers({
-				books: Books.loaded,
-				update: e.data,
-				progress: Books.loaded.length * 100 / count
+				update: e.data.payload,
+				loaded: e.data.processed,
+				progress: e.data.processed * 100 / count
 			});
 		};
 

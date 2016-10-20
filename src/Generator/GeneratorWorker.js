@@ -1,5 +1,5 @@
 import Chance from 'chance';
-import BookGenres from './model/Genres';
+import BookGenres from '../Books/BooksGenres';
 
 var chance = Chance();
 
@@ -8,10 +8,11 @@ onmessage = function(e) {
 	for (var i = 1; i <= e.data.booksCount; i++){
 		books.push(generateBook(i));
 		if (books.length % e.data.batch == 0 || books.length == e.data.booksCount) {
-			postMessage(books);
+			postMessage({payload: books, processed: i});
 			books = [];
 		}
 	}
+
 };
 
 function generateAuthor() {
@@ -26,7 +27,7 @@ function generateBook(id) {
 		id: id,
 		name: getRandomTitle(),
 		genre: getRandomGenre(),
-		publishDate: new Date(chance.date({year: getNumberBetween(1800, 2015)})),
+		publishDate: chance.date({year: getNumberBetween(1800, 2015)}),
 		author: generateAuthor()
 	}
 }

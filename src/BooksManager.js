@@ -1,53 +1,83 @@
 import React from 'react';
-import _ from 'lodash';
-import Genres from './model/Genres'
-import BooksList from './BooksList';
-import {BookCheckers} from './model/Books'
 import {Form, FormGroup, FormControl} from 'react-bootstrap'
+import _ from 'lodash';
+import Genres from './Books/BooksGenres'
+import BooksList from './BooksList';
+import Generator from './Generator/Generator';
+import Books from './Books/Books';
 
+import Worker from 'worker?inline!./BooksManagerWorker.js';
+
+
+var worker = new Worker();
 
 export default React.createClass({
 
 	componentWillMount: function() {
-		this.updateFilter = _.debounce(this.updateFilter, 500);
+		Generator.registerUpdateHandler(({progress}) => {
+			if (progress == 100)
+				this.fetchBooks();
+		});
+
+		this.updateFilter = _.debounce(this.updateFilter, 300);
 	},
+
 
 	getInitialState: function () {
 		return {
-			filters: {}
+			books: [],
+			filters: {},
+			sortOptions: {},
+			filteredBooks: [],
+			processing: false
 		}
 	},
 
-	filterAuthorGender: function(book) {
-		return book.author.gender === this.state.filters.filterAuthorGender;
-	} ,
-	filterAuthorName: function(book) {
-		return book.author.name.indexOf(this.state.filters.filterAuthorName) !== -1;
-	},
-	filterBookGenre: function(book) {
-		return book.genre === this.state.filters.filterBookGenre;
-	},
-	filterBookType: function(book) {
-		return BookCheckers[this.state.filters.filterBookType](book)
-	},
 
 	updateFilter: function(name, value) {
 		var filters = JSON.parse(JSON.stringify(this.state.filters));
 		filters[name] = value;
-		this.setState({filters});
+
+		this.fetchBooks(filters, this.state.sortOptions);
+	},
+
+
+	updateSortOptions: function(options) {
+		this.fetchBooks(this.state.filters, options);
+	},
+
+	fetchBooks: function(filters, sortOptions) {
+		filters = filters || this.state.filters;
+		sortOptions = sortOptions || this.state.sortOptions;
+
+		this.setState({
+			processing: true,
+			filters: filters,
+			sortOptions: sortOptions
+		});
+
+		worker.terminate();
+		worker = new Worker();
+		worker.onmessage = (e) => {
+			this.setState({
+				books: e.data,
+				processing: false
+			})
+		};
+
+		worker.postMessage({
+			filters: filters,
+			sortOptions: sortOptions,
+			books: Books.getJSON()
+		});
 	},
 
 	render: function () {
 
-		const filteredBooks = this._isFilterEnabled()
-			? this.props.books.filter(this._filterBook)
-			: this.props.books;
-
 
 		return (
 			<div>
-				{this.state.updating}
-				<Form inline>
+				<Form inline onSubmit={e => e.preventDefault()}>
 					<FormGroup>
 						<FormControl
 							type="text"
@@ -68,11 +98,10 @@ export default React.createClass({
 							data-name="filterBookGenre"
 							onChange={e => this.updateFilter(e.target.dataset.name, e.target.value)}>
 							<option value="">Book genre</option>
-							{Genres.sort().map(function (genre, i) {
+							{Genres.map(function (genre, i) {
 								return <option key={i} value={genre}>{genre}</option>
 							})}
 						</FormControl>
-
 						<FormControl
 							componentClass="select"
 							data-name="filterBookType"
@@ -83,22 +112,15 @@ export default React.createClass({
 						</FormControl>
 					</FormGroup>
 				</Form>
+
 				<BooksList
-					books={filteredBooks}
-					finished={this.props.finished}/>
-				<div>{filteredBooks.length} books found</div>
+					books={this.state.books}
+					sortOptions={this.state.sortOptions}
+					updateSortOptions={this.updateSortOptions}
+					processing={this.state.processing}/>
+
 			</div>
 		)
-	},
-
-	_isFilterEnabled: function () {
-		return Object.keys(this.state.filters).some(key => key);
-	},
-
-	_filterBook: function(book) {
-		return Object.keys(this.state.filters)
-			.filter( key => this.state.filters[key] )
-			.reduce( (isFiltered, filterName) => isFiltered &= this[filterName](book) , true);
 	}
 });
 

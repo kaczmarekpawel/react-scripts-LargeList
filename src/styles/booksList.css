@@ -5,3 +5,18 @@
 .finance-rampage {
     background-color: #5cb85c;
 }
+
+.loading-mask {
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: rgba(255,255,255, 0.55);
+}
+
+.loading-mask.active {
+    display: block;
+}
