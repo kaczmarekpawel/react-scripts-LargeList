@@ -1,4 +1,5 @@
-import BookFilters from './Books/BooksFilters';
+import {filterBook} from './Books/BooksFilters';
+import {compareBooks} from './Books/BooksComparer';
 
 onmessage = function(e) {
 
@@ -14,25 +15,3 @@ onmessage = function(e) {
 	postMessage(books);
 	close();
 };
-
-function filterBook(book, activeFilters) {
-	return Object.keys(BookFilters)
-		.filter( key => activeFilters[key] )
-		.reduce( (isFiltered, filterName) =>
-			isFiltered && BookFilters[filterName](book, activeFilters[filterName]) , true);
-}
-
-function compareBooks (b1, b2, sortBy) {
-	var v1 = resolveObjectFieldValue(b1, sortBy),
-		v2 = resolveObjectFieldValue(b2, sortBy);
-
-	if (v1 > v2) return -1;
-	else if (v1 < v2) return 1;
-	else return 0;
-}
-
-function resolveObjectFieldValue(object, fieldName) {
-	return fieldName.split('.').reduce((prev, curr) => {
-		return prev ? prev[curr] : undefined;
-	}, object || self)
-}

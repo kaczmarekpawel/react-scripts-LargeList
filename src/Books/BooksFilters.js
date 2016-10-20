@@ -19,6 +19,13 @@ export const isHalloweenBook = (book) => {
 		&& pd.getDate() === 31
 };
 
+export const filterBook = (book, filterFunctions) =>
+	Object.keys(BookFilters)
+		.filter(key => filterFunctions[key])
+		.reduce((isFiltered, filterName) =>
+			isFiltered && BookFilters[filterName](book, filterFunctions[filterName]), true);
+
+
 
 export const isFridayFinanceBook = (book) => {
 	var pd = new Date(book.publishDate);
@@ -40,5 +47,6 @@ export default {
 	filterBookGenre,
 	filterBookType,
 	isHalloweenBook,
-	isFridayFinanceBook
+	isFridayFinanceBook,
+	filterBook
 }

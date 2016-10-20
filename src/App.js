@@ -3,8 +3,9 @@ import Generator from './Generator/Generator';
 import AppProgressBar from './ProgressBar';
 import BooksManager from './BooksManager';
 
-var totalBooks = 100000;
+import './Utils';
 
+var totalBooks = 100000;
 
 export default React.createClass({
 	componentWillMount: function() {

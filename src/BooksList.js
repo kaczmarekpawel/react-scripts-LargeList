@@ -2,15 +2,9 @@ import React from 'react';
 import {Table, Column, AutoSizer} from 'react-virtualized'
 import TableStyles from 'react-virtualized/styles.css';
 import './styles/booksList.css';
+import {resolveObjectFieldValue} from './Utils'
 
 import BookFilters from './Books/BooksFilters';
-
-
-function resolveName(object, path) {
-	return path.split('.').reduce((prev, curr) => {
-		return prev ? prev[curr] : undefined;
-	}, object || self)
-}
 
 
 export default React.createClass({
@@ -83,8 +77,9 @@ export default React.createClass({
 	},
 
 	_customCellDataGetter: function(columnData) {
-		return resolveName(columnData.rowData, columnData.dataKey);
+		return resolveObjectFieldValue(columnData.rowData, columnData.dataKey);
 	},
+
 
 	_getRowClassName: function(book) {
 		if (!book) return;
