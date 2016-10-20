@@ -1,6 +1,7 @@
 ## Description
-This application generates 1 000 000 random objects (books with authors) using
- [Chance library](http://chancejs.com/) and displays them using [React Virtualized Table](https://github.com/bvaughn/react-virtualized)
+This application generates huge collection (default 100k) of random objects (books with authors) using
+ [Chance library](http://chancejs.com/) and displays them using [React Virtualized Table](https://github.com/bvaughn/react-virtualized).
+ Data generation and collection operations(filtering and sorting) are run inside Web Workers
 
 Project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 Check it's readme for more details. 
