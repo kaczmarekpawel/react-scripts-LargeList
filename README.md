@@ -1,7 +1,11 @@
-This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
+## Description
+This application generates 1 000 000 random objects (books with authors) using
+ [Chance library](http://chancejs.com/) and displays them using [React Virtualized Table](https://github.com/bvaughn/react-virtualized)
+
+Project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 Check it's readme for more details. 
 
-Below you will find some information on how to perform common tasks.  
+Below you will find some information on how to start / build it  
 
 ## Starting application
 While being in the app root folder: 
