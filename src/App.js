@@ -1,24 +1,27 @@
 import React from 'react';
-import Generator from './Generator';
+import Generator from './Generator/Generator';
 import AppProgressBar from './ProgressBar';
 import BooksManager from './BooksManager';
 
-var totalBooks = 10000;
+import './Utils';
+
+var totalBooks = 100000;
 
 export default React.createClass({
 	componentWillMount: function() {
 		Generator.generateBooks(totalBooks);
 		Generator.registerUpdateHandler(
-			({books, progress}) => this.setState({books, progress})
+			({loaded, progress}) => this.setState({loaded, progress})
 		);
 	},
 
 	getInitialState: function() {
 		return {
-			progress: 0,
-			books: []
+			loaded: 0,
+			progress: 0
 		};
 	},
+
 	
 	render: function() {
 
@@ -26,10 +29,10 @@ export default React.createClass({
 			<div>
 				<AppProgressBar
 					progress={this.state.progress}
-					loaded={this.state.books.length}
+					loaded={this.state.loaded}
 					total={totalBooks}/>
 				<BooksManager
-					books={this.state.books}/>
+					books={this.state.progress}/>
 			</div>
 		)
 	}

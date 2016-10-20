@@ -1,81 +1,126 @@
 import React from 'react';
-import Genres from './model/Genres'
-import BooksList from './BooksList';
 import {Form, FormGroup, FormControl} from 'react-bootstrap'
+import _ from 'lodash';
+import Genres from './Books/BooksGenres'
+import BooksList from './BooksList';
+import Generator from './Generator/Generator';
+import Books from './Books/Books';
 
+import Worker from 'worker?inline!./BooksManagerWorker.js';
+
+
+var worker = new Worker();
 
 export default React.createClass({
 
+	componentWillMount: function() {
+		Generator.registerUpdateHandler(({progress}) => {
+			if (progress == 100)
+				this.fetchBooks();
+		});
+
+		this.updateFilter = _.debounce(this.updateFilter, 300);
+	},
+
+
 	getInitialState: function () {
 		return {
-			authorName: '',
-			authorGender: null,
-			bookGenre: ''
+			books: [],
+			filters: {},
+			sortOptions: {},
+			filteredBooks: [],
+			processing: false
 		}
 	},
 
-	updateFilter: function (e) {
-		var state = {};
-		state[e.target.dataset.name] = e.target.value;
-		this.setState(state);
+
+	updateFilter: function(name, value) {
+		var filters = JSON.parse(JSON.stringify(this.state.filters));
+		filters[name] = value;
+
+		this.fetchBooks(filters, this.state.sortOptions);
+	},
+
+
+	updateSortOptions: function(options) {
+		this.fetchBooks(this.state.filters, options);
+	},
+
+	fetchBooks: function(filters, sortOptions) {
+		filters = filters || this.state.filters;
+		sortOptions = sortOptions || this.state.sortOptions;
+
+		this.setState({
+			processing: true,
+			filters: filters,
+			sortOptions: sortOptions
+		});
+
+		worker.terminate();
+		worker = new Worker();
+		worker.onmessage = (e) => {
+			this.setState({
+				books: e.data,
+				processing: false
+			})
+		};
+
+		worker.postMessage({
+			filters: filters,
+			sortOptions: sortOptions,
+			books: Books.getJSON()
+		});
 	},
 
 	render: function () {
 
-		const filteredBooks = this._isFilterDisabled()
-			? this.props.books
-			: this.props.books.filter(this._filterBook);
 
 		return (
 			<div>
-				<Form inline>
+				<Form inline onSubmit={e => e.preventDefault()}>
 					<FormGroup>
 						<FormControl
 							type="text"
-							data-name="authorName"
+							data-name="filterAuthorName"
 							value={this.state.authorName}
 							placeholder="Author name"
-							onChange={this.updateFilter}/>
+							onChange={e => this.updateFilter(e.target.dataset.name, e.target.value)}/>
 						<FormControl
 							componentClass="select"
-							data-name="authorGender"
-							onChange={this.updateFilter}>
+							data-name="filterAuthorGender"
+							onChange={e => this.updateFilter(e.target.dataset.name, e.target.value)}>
 							<option value="">Author gender</option>
 							<option value="Male">Male</option>
 							<option value="Female">Female</option>
 						</FormControl>
 						<FormControl
 							componentClass="select"
-							data-name="bookGenre"
-							onChange={this.updateFilter}>
+							data-name="filterBookGenre"
+							onChange={e => this.updateFilter(e.target.dataset.name, e.target.value)}>
 							<option value="">Book genre</option>
-							{Genres.sort().map(function (genre, i) {
+							{Genres.map(function (genre, i) {
 								return <option key={i} value={genre}>{genre}</option>
 							})}
 						</FormControl>
+						<FormControl
+							componentClass="select"
+							data-name="filterBookType"
+							onChange={e => this.updateFilter(e.target.dataset.name, e.target.value)}>
+							<option value="">Special Book Type</option>
+							<option value="isHalloweenBook">Halloween Book</option>
+							<option value="isFridayFinanceBook">Friday Finance Book</option>
+						</FormControl>
 					</FormGroup>
 				</Form>
+
 				<BooksList
-					books={filteredBooks}
-					finished={this.props.finished}/>
-				<div>{filteredBooks.length} books found</div>
+					books={this.state.books}
+					sortOptions={this.state.sortOptions}
+					updateSortOptions={this.updateSortOptions}
+					processing={this.state.processing}/>
+
 			</div>
 		)
-	},
-
-	_isFilterDisabled: function () {
-		return !this.state.authorName && !this.state.authorGender && !this.state.bookGenre;
-	},
-
-	_filterBook: function(book) {
-		var filtered = true;
-		if (this.state.authorName)
-			filtered &= book.author.name.indexOf(this.state.authorName) !== -1;
-		if (this.state.authorGender)
-			filtered &= book.author.gender === this.state.authorGender;
-		if (this.state.bookGenre)
-			filtered &= book.genre === this.state.bookGenre;
-		return filtered;
 	}
 });
 

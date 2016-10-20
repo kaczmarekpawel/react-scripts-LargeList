@@ -1,0 +1,1 @@
+http-server.cmd ./build -p 8082

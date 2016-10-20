@@ -1,17 +1,11 @@
 import React from 'react';
-import {Table, Column, SortDirection, AutoSizer} from 'react-virtualized'
-
-import {BookCheckers} from './model/Books';
-
+import {Table, Column, AutoSizer} from 'react-virtualized'
 import TableStyles from 'react-virtualized/styles.css';
 import './styles/booksList.css';
+import {resolveObjectFieldValue} from './Utils'
 
+import BookFilters from './Books/BooksFilters';
 
-function resolveName(object, path) {
-	return path.split('.').reduce((prev, curr) => {
-		return prev ? prev[curr] : undefined;
-	}, object || self)
-}
 
 export default React.createClass({
 
@@ -24,97 +18,74 @@ export default React.createClass({
 
 	render: function () {
 
-		const sortedList = !this.state.sortBy
-			? this.props.books
-			: this._getSortedBooks(this.props.books);
-
 		function rowGetter(param) {
-			return sortedList[param.index];
+			return this.props.books[param.index];
 		}
 
 		return (
 			<AutoSizer disableHeight>
 				{({ width }) => (
-					<Table
-						disableHeader={false}
-						headerClassName={TableStyles.headerColumn}
-						headerHeight={60}
-						height={600}
-						width={window.innerWidth}
-						rowHeight={30}
-						rowCount={sortedList.length}
-						rowGetter={rowGetter.bind(this)}
-						rowClassName={({index}) => this._getRowClassName(sortedList[index])}
-						sort={this._sort}
-						sortBy={this.state.sortBy}
-						sortDirection={this.state.sortDirection}>
-						<Column
-							label='#'
-							dataKey='id'
-							width={100}
-						/>
-						<Column
-							label="Genre"
-							dataKey="genre"
-							width={120}
-						/>
-						<Column
-							label="Gender"
-							cellDataGetter={this._customCellDataGetter}
-							dataKey="author.gender"
-							width={80}
-						/>
-						<Column
-							label="Author"
-							cellDataGetter={this._customCellDataGetter}
-							dataKey="author.name"
-							width={120}
-						/>
-						<Column
-							label='Name'
-							dataKey='name'
-							width={360}
-							flexGrow={1}
-						/>
-					</Table>
+					<div style={{position: 'absolute'}}>
+						<div onClick={e => {e.stopPropagation()}} className={this.props.processing ? 'loading-mask active': 'loading-mask'}/>
+						<Table
+							disableHeader={false}
+							headerClassName={TableStyles.headerColumn}
+							headerHeight={60}
+							height={600}
+							width={window.innerWidth}
+							rowHeight={30}
+							rowCount={this.props.books.length}
+							rowGetter={rowGetter.bind(this)}
+							rowClassName={({index}) => this._getRowClassName(this.props.books[index])}
+							sort={this.props.updateSortOptions}
+							sortBy={this.props.sortOptions.sortBy}
+							sortDirection={this.props.sortOptions.sortDirection}>
+							<Column
+								label='#'
+								dataKey='id'
+								width={100}
+							/>
+							<Column
+								label="Genre"
+								dataKey="genre"
+								width={120}
+							/>
+							<Column
+								label="Gender"
+								cellDataGetter={this._customCellDataGetter}
+								dataKey="author.gender"
+								width={80}
+							/>
+							<Column
+								label="Author"
+								cellDataGetter={this._customCellDataGetter}
+								dataKey="author.name"
+								width={120}
+							/>
+							<Column
+								label='Name'
+								dataKey='name'
+								width={360}
+								flexGrow={1}
+							/>
+						</Table>
+						<div>{this.props.books.length} books found</div>
+					</div>
 				)}
 			</AutoSizer>
 		)
 	},
 
 	_customCellDataGetter: function(columnData) {
-		return resolveName(columnData.rowData, columnData.dataKey);
+		return resolveObjectFieldValue(columnData.rowData, columnData.dataKey);
 	},
 
-	_getSortedBooks: function (books) {
-		return books.sort(function (b1, b2) {
-			var comp = this._compareBooks(b1, b2);
-			return this.state.sortDirection === SortDirection.ASC
-				? comp : -comp;
-		}.bind(this));
-	},
 
 	_getRowClassName: function(book) {
 		if (!book) return;
 
-		if (BookCheckers.isFridayFinanceBook(book)) return 'finance-rampage';
-		else if (BookCheckers.isHalloweenBook(book)) return 'halloween-book'
-	},
-
-	_compareBooks: function (b1, b2) {
-		var v1 = resolveName(b1, this.state.sortBy),
-			v2 = resolveName(b2, this.state.sortBy);
-
-		if (v1 > v2) return -1;
-		else if (v1 < v2) return 1;
-		else return 0;
-	},
-
-	_sort: function (options) {
-		this.setState({
-			sortBy: options.sortBy,
-			sortDirection: options.sortDirection
-		});
+		if (BookFilters.isFridayFinanceBook(book)) return 'finance-rampage';
+		else if (BookFilters.isHalloweenBook(book)) return 'halloween-book'
 	}
 });
 
