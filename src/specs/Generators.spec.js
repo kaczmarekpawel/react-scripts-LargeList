@@ -27,7 +27,7 @@ describe('Generators specs', () => {
 		expect(book.author.name).toBeDefined();
 		testBookStringField(book.author.name);
 		testBookStringField(book.author.gender);
-		expect(book.author.gender === ('Male' || 'Female')).toBeTruthy()
+		expect(book.author.gender === 'Male' || book.author.gender === 'Female').toBeTruthy()
 	});
 
 	it('generating title should return random title', () => {

@@ -1,5 +1,5 @@
 ## Description
-This application generates huge collection (default 100k) of random objects (books with authors) using
+This application generates a huge collection (default 100k) of a random objects (books with authors) using
  [Chance library](http://chancejs.com/) and displays them using [React Virtualized Table](https://github.com/bvaughn/react-virtualized).
  Data generation and collection operations(filtering and sorting) are run inside Web Workers
 
