@@ -15,7 +15,7 @@ export default React.createClass({
 
 	componentWillMount: function() {
 		Generator.registerUpdateHandler(({progress}) => {
-			if (progress == 100)
+			if (progress === 100)
 				this.fetchBooks();
 		});
 

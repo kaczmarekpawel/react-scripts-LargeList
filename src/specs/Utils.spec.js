@@ -11,6 +11,8 @@ it('name resolver should return internal object values based on string', () => {
 			baz: 'inVal'
 		}
 	};
+	expect(Utils.resolveObjectFieldValue(obj)).toEqual(obj);
+	expect(Utils.resolveObjectFieldValue(obj, '')).toEqual(obj);
 	expect(Utils.resolveObjectFieldValue(obj, 'foo')).toEqual('upVal');
 	expect(Utils.resolveObjectFieldValue(obj, 'bar.baz')).toEqual('inVal');
 	expect(Utils.resolveObjectFieldValue(obj, 'bar')).toEqual({baz: 'inVal'});
