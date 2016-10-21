@@ -4,13 +4,25 @@
 import BooksFilters from '../Books/BooksFilters';
 
 describe('BooksFilters', () => {
-    var book = {
+
+    var book =  {
         id: 1,
-        name: 'Super specs book',
+        name: 'Special finance specs',
         genre: 'Finance',
-        publishDate: (new Date()).toString(),
+        publishDate: (new Date(2016,9,28)).toString(),
         author: {
             name: 'John Doe',
+            gender: 'Male'
+        }
+    };
+    var financeBook = book;
+    var horrorBook = {
+        id: 4,
+        name: 'PHP Horrors',
+        genre: 'Horror',
+        publishDate: (new Date(2015,9,31)).toString(),
+        author: {
+            name: 'John Malkovich',
             gender: 'Male'
         }
     };
@@ -40,7 +52,36 @@ describe('BooksFilters', () => {
     it ('should allow filtering book with book title', () => {
         expect(BooksFilters.filterBookTitle(book)).toBeTruthy();
         expect(BooksFilters.filterBookTitle(book,'')).toBeTruthy();
-        expect(BooksFilters.filterBookTitle(book,'Super')).toBeTruthy();
+        expect(BooksFilters.filterBookTitle(book,'Special')).toBeTruthy();
+        expect(BooksFilters.filterBookTitle(book,'special')).toBeTruthy();
         expect(BooksFilters.filterBookTitle(book,'spec')).toBeTruthy();
     });
-})
+
+    it ('should allow filtering book with multiple filters', () => {
+        expect(BooksFilters.filterBook(book)).toBeTruthy();
+
+        expect(BooksFilters.filterBook(book, {
+            filterBookTitle: 'special',
+            filterBookGenre: 'Finance',
+            filterAuthorName: 'John',
+            filterAuthorGender: 'male'
+        })).toBeTruthy();
+
+        expect(BooksFilters.filterBook(book, {
+            filterBookTitle: 'special',
+            filterBookGenre: 'Finance',
+            filterAuthorName: 'Jennifer',
+            filterAuthorGender: 'male'
+        })).toBeFalsy();
+    });
+
+    it ('should allow filtering horror books written on 31. October', () => {
+        expect(BooksFilters.isHalloweenBook(horrorBook)).toBeTruthy();
+        expect(BooksFilters.isHalloweenBook(book)).toBeFalsy();
+    });
+
+    it ('should allow filtering finance books written on last friday of any month', () => {
+        expect(BooksFilters.isFridayFinanceBook(financeBook)).toBeTruthy();
+        expect(BooksFilters.isFridayFinanceBook(horrorBook)).toBeFalsy();
+    })
+});

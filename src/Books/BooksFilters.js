@@ -4,17 +4,17 @@
 
 import BookFilters from './BooksFilters';
 
-export const filterAuthorGender = (book, gender) =>
-	book.author.gender.toLowerCase().indexOf((gender || '').toLowerCase()) === 0;
+export const filterAuthorGender = (book, gender = '') =>
+	book.author.gender.toLowerCase().indexOf(gender.toLowerCase()) === 0;
 
-export const filterBookGenre = (book, genre) =>
-	book.genre.toLowerCase().indexOf((genre || '').toLowerCase()) === 0;
+export const filterBookGenre = (book, genre = '') =>
+	book.genre.toLowerCase().indexOf(genre.toLowerCase()) === 0;
 
-export const filterAuthorName = (book, name) =>
-	book.author.name.toLowerCase().indexOf((name || '').toLowerCase()) !== -1;
+export const filterAuthorName = (book, name = '') =>
+	book.author.name.toLowerCase().indexOf(name.toLowerCase()) !== -1;
 
-export const filterBookTitle = (book, title) =>
-	book.name.toLowerCase().indexOf((title || '').toLowerCase()) !== -1;
+export const filterBookTitle = (book, title = '') =>
+	book.name.toLowerCase().indexOf(title.toLowerCase()) !== -1;
 
 export const filterBookType = (book, typeChecker) => BookFilters[typeChecker](book);
 
@@ -26,7 +26,7 @@ export const isHalloweenBook = (book) => {
 		&& pd.getDate() === 31
 };
 
-export const filterBook = (book, filterFunctions) =>
+export const filterBook = (book, filterFunctions = {}) =>
 	Object.keys(BookFilters)
 		.filter(key => filterFunctions[key])
 		.reduce((isFiltered, filterName) =>
