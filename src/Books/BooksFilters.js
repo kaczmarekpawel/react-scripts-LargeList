@@ -4,13 +4,20 @@
 
 import BookFilters from './BooksFilters';
 
-export const filterAuthorGender = (book, gender) => book.author.gender === gender;
+export const filterAuthorGender = (book, gender) =>
+	book.author.gender.toLowerCase().indexOf((gender || '').toLowerCase()) === 0;
 
-export const filterAuthorName = (book, name) => book.author.name.indexOf(name) !== -1;
+export const filterBookGenre = (book, genre) =>
+	book.genre.toLowerCase().indexOf((genre || '').toLowerCase()) === 0;
 
-export const filterBookGenre = (book, genre) => book.genre === genre;
+export const filterAuthorName = (book, name) =>
+	book.author.name.toLowerCase().indexOf((name || '').toLowerCase()) !== -1;
+
+export const filterBookTitle = (book, title) =>
+	book.name.toLowerCase().indexOf((title || '').toLowerCase()) !== -1;
 
 export const filterBookType = (book, typeChecker) => BookFilters[typeChecker](book);
+
 
 export const isHalloweenBook = (book) => {
 	var pd = new Date(book.publishDate);
@@ -24,7 +31,6 @@ export const filterBook = (book, filterFunctions) =>
 		.filter(key => filterFunctions[key])
 		.reduce((isFiltered, filterName) =>
 			isFiltered && BookFilters[filterName](book, filterFunctions[filterName]), true);
-
 
 
 export const isFridayFinanceBook = (book) => {
@@ -45,6 +51,7 @@ export default {
 	filterAuthorGender,
 	filterAuthorName,
 	filterBookGenre,
+	filterBookTitle,
 	filterBookType,
 	isHalloweenBook,
 	isFridayFinanceBook,

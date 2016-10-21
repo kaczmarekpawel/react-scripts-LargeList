@@ -10,6 +10,7 @@ describe('Books', () => {
 		Books.clear();
 	});
 
+
 	it ('should allow to clear the books collection', () => {
 		Books.appendBatch(booksBatch);
 		Books.clear();

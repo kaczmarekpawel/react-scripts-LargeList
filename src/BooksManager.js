@@ -86,6 +86,12 @@ export default React.createClass({
 							placeholder="Author name"
 							onChange={e => this.updateFilter(e.target.dataset.name, e.target.value)}/>
 						<FormControl
+							type="text"
+							data-name="filterBookTitle"
+							value={this.state.bookTitle}
+							placeholder="Book title"
+							onChange={e => this.updateFilter(e.target.dataset.name, e.target.value)}/>
+						<FormControl
 							componentClass="select"
 							data-name="filterAuthorGender"
 							onChange={e => this.updateFilter(e.target.dataset.name, e.target.value)}>
