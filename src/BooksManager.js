@@ -73,8 +73,6 @@ export default React.createClass({
 	},
 
 	render: function () {
-
-
 		return (
 			<div>
 				<Form inline onSubmit={e => e.preventDefault()}>

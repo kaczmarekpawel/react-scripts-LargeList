@@ -1,12 +1,12 @@
 ## Description
-This application generates a huge collection (default 100k) of a random objects (books with authors) using
+This application generates a collection (default 10k) of a random objects (books with authors) using
  [Chance library](http://chancejs.com/) and displays them using [React Virtualized Table](https://github.com/bvaughn/react-virtualized).
  Data generation and collection operations(filtering and sorting) are run inside Web Workers
 
 Project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 Check it's readme for more details. 
 
-Below you will find some information on how to start / build it  
+Below is information on how to start / build / test it  
 
 ## Starting application
 While being in the app root folder: 
@@ -22,7 +22,7 @@ npm start
 ```
 
 ## Building application
-If You want to check to optimized version of the app
+To build the optimized version of the app
 - Build application
 ```sh
 npm run build
@@ -35,4 +35,9 @@ http-server ./build -p 9000
 
 Provided that the project is has been built it should be running under http://localhost:9000
 
+## Running tests
 
+To run all specs just type
+```sh
+npm test
+``` 
